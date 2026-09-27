@@ -61,7 +61,13 @@ const AdminPage = () => {
   };
 
   if (loading) {
-    return <p className="page-feedback">Loading admin panel...</p>;
+    return (
+      <div className="container page" aria-hidden="true">
+        <div className="skeleton thin" style={{ width: "180px", height: "28px" }} />
+        <div className="skeleton-block" style={{ marginTop: "1.5rem" }} />
+        <div className="skeleton-block" style={{ marginTop: "1.5rem" }} />
+      </div>
+    );
   }
 
   if (!isAdmin) {
@@ -83,11 +89,22 @@ const AdminPage = () => {
           {users.map((u) => (
             <li key={u._id} className="comment-item">
               <div className="comment-head">
-                <span className="comment-author">{u.name}</span>
-                <span className="comment-date">{u.email}</span>
+                <span className="avatar-small" aria-hidden="true">
+                  {(u.name || "?").charAt(0).toUpperCase()}
+                </span>
+                <div>
+                  <span className="comment-author">{u.name}</span>
+                  <span className="comment-date">{u.email}</span>
+                </div>
+                <span
+                  className={
+                    u.role === "admin" ? "badge badge-admin" : "badge badge-user"
+                  }
+                >
+                  {u.role || "user"}
+                </span>
                 <span className="comment-date">
-                  {u.role === "admin" ? "admin" : "user"} ·{" "}
-                  {formatDate(u.createdAt)}
+                  Joined {formatDate(u.createdAt)}
                 </span>
               </div>
             </li>
@@ -98,7 +115,13 @@ const AdminPage = () => {
       <section className="comments">
         <h2>All Blogs ({blogs.length})</h2>
         {blogs.length === 0 ? (
-          <p className="alert alert-info">No blogs published yet.</p>
+          <div className="empty-state">
+            <span className="empty-state-icon" aria-hidden="true">
+              ✎
+            </span>
+            <h2>No blogs published yet</h2>
+            <p>Published blogs across all users will show up here.</p>
+          </div>
         ) : (
           <ul className="comment-list">
             {blogs.map((blog) => (

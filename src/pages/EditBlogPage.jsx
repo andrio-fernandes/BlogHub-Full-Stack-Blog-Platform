@@ -64,7 +64,15 @@ const EditBlogPage = () => {
   };
 
   if (loading) {
-    return <p className="page-feedback">Loading blog for editing...</p>;
+    return (
+      <div className="container page auth-page">
+        <div className="auth-card" aria-hidden="true">
+          <div className="skeleton title" style={{ width: "45%" }} />
+          <div className="skeleton thin" style={{ width: "60%", marginTop: "0.5rem" }} />
+          <div className="skeleton" style={{ height: 200, marginTop: "1.25rem" }} />
+        </div>
+      </div>
+    );
   }
 
   return (

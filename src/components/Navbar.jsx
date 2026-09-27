@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
@@ -7,11 +7,19 @@ const Navbar = () => {
   const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const linkClass = ({ isActive }) =>
     "nav-link" + (isActive ? " active" : "");
 
   const close = () => setOpen(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 8);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
 
   const handleLogout = () => {
     setBusy(true);
@@ -23,7 +31,7 @@ const Navbar = () => {
   };
 
   return (
-    <header className="navbar">
+    <header className={`navbar ${scrolled ? "scrolled" : ""}`}>
       <div className="nav-inner">
         <Link to="/" className="brand" onClick={close}>
           BlogHub
@@ -32,9 +40,10 @@ const Navbar = () => {
         <button
           className="nav-toggle"
           onClick={() => setOpen((o) => !o)}
-          aria-label="Toggle menu"
+          aria-label={open ? "Close menu" : "Open menu"}
+          aria-expanded={open}
         >
-          {open ? "Close" : "Menu"}
+          {open ? "✕" : "☰"}
         </button>
 
         <nav className={`nav-menu ${open ? "open" : ""}`}>

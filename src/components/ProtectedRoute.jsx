@@ -9,7 +9,12 @@ const ProtectedRoute = ({ children }) => {
   const location = useLocation();
 
   if (loading) {
-    return <div className="page-feedback">Checking login...</div>;
+    return (
+      <div className="page-feedback">
+        <span className="spinner" aria-hidden="true" />
+        <span>Checking login...</span>
+      </div>
+    );
   }
 
   if (!user) {

@@ -1,8 +1,11 @@
 import { useCallback, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import api from "../api";
 import BlogCard from "../components/BlogCard";
+import { useAuth } from "../context/AuthContext";
 
 const HomePage = () => {
+  const { user } = useAuth();
   const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -78,14 +81,48 @@ const HomePage = () => {
       )}
 
       {loading ? (
-        <p className="page-feedback">Loading blogs...</p>
+        <div className="skeleton-grid" aria-hidden="true">
+          {[0, 1, 2, 3, 4, 5].map((i) => (
+            <div key={i} className="skeleton-card">
+              <div className="skeleton thin" />
+              <div className="skeleton title" />
+              <div className="skeleton body-tall" />
+              <div className="skeleton thin" style={{ width: "30%" }} />
+            </div>
+          ))}
+        </div>
       ) : error ? (
         <div className="alert alert-error">{error}</div>
       ) : blogs.length === 0 ? (
-        <div className="alert alert-info">
-          {query
-            ? "No blogs matched your search."
-            : "No blogs published yet. Be the first to write one!"}
+        <div className="empty-state">
+          <span className="empty-state-icon" aria-hidden="true">
+            {query ? "⌕" : "✎"}
+          </span>
+          <h2>{query ? "No matches found" : "Nothing published yet"}</h2>
+          <p>
+            {query
+              ? "No blogs matched your search. Try a different title."
+              : "Be the first to write one and get the community going."}
+          </p>
+          {query ? (
+            <button
+              className="btn btn-outline"
+              onClick={() => {
+                setSearch("");
+                setQuery("");
+              }}
+            >
+              Clear search
+            </button>
+          ) : user ? (
+            <Link to="/blogs/new" className="btn btn-primary">
+              Create a blog
+            </Link>
+          ) : (
+            <Link to="/register" className="btn btn-primary">
+              Get started
+            </Link>
+          )}
         </div>
       ) : (
         <section className="blog-grid">

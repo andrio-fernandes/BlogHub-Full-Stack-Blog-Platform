@@ -3,7 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import api from "../api";
 import { useAuth } from "../context/AuthContext";
 import { useToast } from "../context/ToastContext";
-import { formatDateTime } from "../utils/formatDate";
+import { formatDateTime, timeAgo } from "../utils/formatDate";
 
 const BlogDetailsPage = () => {
   const { id } = useParams();
@@ -98,7 +98,12 @@ const BlogDetailsPage = () => {
   };
 
   if (loading) {
-    return <p className="page-feedback">Loading blog...</p>;
+    return (
+      <div className="container page" aria-hidden="true">
+        <div className="skeleton thin" style={{ width: "120px", marginBottom: "1rem" }} />
+        <div className="skeleton-block" style={{ height: "300px" }} />
+      </div>
+    );
   }
 
   if (error && !blog) {
@@ -175,7 +180,13 @@ const BlogDetailsPage = () => {
         )}
 
         {comments.length === 0 ? (
-          <p className="alert alert-info">No comments yet. Be the first to comment!</p>
+          <div className="empty-state">
+            <span className="empty-state-icon" aria-hidden="true">
+              💬
+            </span>
+            <h2>No comments yet</h2>
+            <p>Be the first to join the discussion.</p>
+          </div>
         ) : (
           <ul className="comment-list">
             {comments.map((comment) => {
@@ -193,8 +204,11 @@ const BlogDetailsPage = () => {
                       <span className="comment-author">
                         {comment.user?.name || "Unknown"}
                       </span>
-                      <span className="comment-date">
-                        {formatDateTime(comment.createdAt)}
+                      <span
+                        className="comment-date"
+                        title={formatDateTime(comment.createdAt)}
+                      >
+                        {timeAgo(comment.createdAt)}
                       </span>
                     </div>
                     {own && (

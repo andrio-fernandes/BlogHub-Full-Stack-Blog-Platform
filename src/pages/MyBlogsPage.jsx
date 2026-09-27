@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import api from "../api";
-import { formatDate } from "../utils/formatDate";
+import BlogCard from "../components/BlogCard";
 
 const MyBlogsPage = () => {
   const [blogs, setBlogs] = useState([]);
@@ -52,51 +52,60 @@ const MyBlogsPage = () => {
       </div>
 
       {loading ? (
-        <p className="page-feedback">Loading your blogs...</p>
+        <div className="skeleton-grid" aria-hidden="true">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="skeleton-card">
+              <div className="skeleton thin" />
+              <div className="skeleton title" />
+              <div className="skeleton body-tall" />
+              <div className="skeleton thin" style={{ width: "30%" }} />
+            </div>
+          ))}
+        </div>
       ) : error ? (
         <div className="alert alert-error">{error}</div>
       ) : blogs.length === 0 ? (
-        <div className="alert alert-info">
-          You haven't written any blogs yet.{" "}
-          <Link to="/blogs/new">Write your first post</Link>.
+        <div className="empty-state">
+          <span className="empty-state-icon" aria-hidden="true">
+            ✎
+          </span>
+          <h2>No posts yet</h2>
+          <p>
+            You haven't written any blogs yet.{" "}
+            <Link to="/blogs/new">Write your first post</Link>.
+          </p>
+          <Link to="/blogs/new" className="btn btn-primary">
+            Create your first blog
+          </Link>
         </div>
       ) : (
         <>
           <div className="blog-grid">
             {blogs.map((blog) => (
-              <div key={blog._id} className="blog-card">
-                <div className="blog-card-meta">
-                  <span className="blog-card-author">{formatDate(blog.createdAt)}</span>
-                  <span className="blog-card-updated">
-                    {blog.updatedAt && blog.updatedAt !== blog.createdAt
-                      ? "edited"
-                      : ""}
-                  </span>
-                </div>
-                <h3 className="blog-card-title">
-                  <Link to={`/blogs/${blog._id}`}>{blog.title}</Link>
-                </h3>
-                <p className="blog-card-excerpt">
-                  {blog.content.length > 140
-                    ? blog.content.slice(0, 140).trimEnd() + "…"
-                    : blog.content}
-                </p>
-                <div className="blog-card-actions">
-                  <Link to={`/blogs/${blog._id}`} className="btn btn-ghost btn-sm">
-                    Read
-                  </Link>
-                  <Link to={`/blogs/${blog._id}/edit`} className="btn btn-outline btn-sm">
-                    Edit
-                  </Link>
-                  <button
-                    className="btn btn-danger btn-sm"
-                    onClick={() => handleDelete(blog)}
-                    disabled={deletingId === blog._id}
-                  >
-                    {deletingId === blog._id ? "Deleting..." : "Delete"}
-                  </button>
-                </div>
-              </div>
+              <BlogCard
+                key={blog._id}
+                blog={blog}
+                actions={
+                  <>
+                    {blog.updatedAt && blog.updatedAt !== blog.createdAt && (
+                      <span className="badge badge-user">edited</span>
+                    )}
+                    <Link
+                      to={`/blogs/${blog._id}/edit`}
+                      className="btn btn-outline btn-sm"
+                    >
+                      Edit
+                    </Link>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      onClick={() => handleDelete(blog)}
+                      disabled={deletingId === blog._id}
+                    >
+                      {deletingId === blog._id ? "Deleting…" : "Delete"}
+                    </button>
+                  </>
+                }
+              />
             ))}
           </div>
           <p className="muted count-line">
