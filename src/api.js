@@ -1,10 +1,11 @@
 import axios from "axios";
 
 // One preconfigured Axios instance used by every page in the app.
-// baseURL "/api" works in development because Vite proxies it to the backend.
-const api = axios.create({
-  baseURL: "/api",
-});
+// Uses the Render API in production; falls back to "/api" in development,
+// where Vite's proxy forwards /api to localhost:5000.
+const baseURL = import.meta.env.VITE_API_URL || "/api";
+
+const api = axios.create({ baseURL });
 
 // Request interceptor: attach the saved token to every request automatically,
 // so we never have to write "Authorization: Bearer ..." by hand.
